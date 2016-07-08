@@ -1,0 +1,14 @@
+<!doctype html>
+<html ng-app="bdApp">
+    <head>
+        <title>Testing Wiki Infobox Parser</title>
+        <meta charset="UTF-8"/>
+        <script src="js/angular.js"></script>
+        <script src="js/app.js"></script>
+    </head>
+    <body ng-controller="bdController">
+        <input type="text" ng-model="title" />
+        <button ng-click="search()">Search</button>
+        {{box}}
+    </body>
+</html>
