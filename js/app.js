@@ -5,6 +5,7 @@ bdApp.controller('bdController',['$scope','apiService',function($scope,apiServic
     $scope.box = "";
     $scope.search = function() {
         console.log($scope.title);
+        var title = new String($scope.title);
         var req = apiService.request(title);
         req.then(function(d){
             $scope.box = apiService.getInfoBox(d);
