@@ -1,10 +1,24 @@
 var bdApp = angular.module('bdApp',[]);
 
-bdApp.controller('bdController',['$scope','$http',function($scope,$http){
+bdApp.controller('bdController',['$scope','apiService',function($scope,apiService){
     $scope.title = "";
     $scope.box = "";
     $scope.search = function() {
-        console.log("hello");
+        console.log($scope.title);
+        var req = apiService.request(title);
+        req.then(function(d){
+            $scope.box = apiService.getInfoBox(d);
+        },function(d){
+            $scope.box = "Error";
+        });
+    };
+    $scope.boxRegex = new RegExp('{{[Ii]nfobox(.|\n)*}}', 'g');
+}]);
+
+bdApp.service('apiService',['$http', function($http){
+    var boxRegex = new RegExp('{{[Ii]nfobox(.|\n)*}}', 'g');
+    this.request = function(title) {
+        console.log(title);
         var url = ['https://en.wikipedia.org/w/api.php?',
                 'action=query&',
                 'prop=revisions&',
@@ -14,24 +28,14 @@ bdApp.controller('bdController',['$scope','$http',function($scope,$http){
                 'callback=JSON_CALLBACK&',
                 'titles=',$scope.title,
                 '&redirects'].join('');
-        $http({
+        return $http({
             url: url,
             method: 'jsonp'
-        }).then(function(d){
-            console.log(d);
-            console.log('SUCCESS');
-            var wikiContent = d.data.query.pages[Object.keys(d.data.query.pages)[0]].revisions[0]['*'];
-            var stuff = $scope.boxRegex.exec(wikiContent,'g');
-            console.log(stuff);
-            $scope.box = stuff[0];
-        }, function(d){
-            console.log('ERROR');
-            console.log(d); 
         });
     };
-    $scope.boxRegex = new RegExp('{{[Ii]nfobox(.|\n)*}}', 'g');
-    $scope.fun = function(){
-        console.log("FUN");
+    this.getInfoBox = function(wikiJson) {
+        wikiJson.data.query.pages[Object.keys(d.data.query.pages)[0]].revisions[0]['*'];
+        var boxSearch = $scope.boxRegex.exec(wikiContent,'g');
+        return stuff[0];
     };
-    
 }]);
