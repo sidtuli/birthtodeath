@@ -5,8 +5,7 @@ bdApp.controller('bdController',['$scope','apiService',function($scope,apiServic
     $scope.box = "";
     $scope.search = function() {
         console.log($scope.title);
-        var title = new String($scope.title);
-        var req = apiService.request(title);
+        var req = apiService.request($scope.title);
         req.then(function(d){
             $scope.box = apiService.getInfoBox(d);
         },function(d){
@@ -27,7 +26,7 @@ bdApp.service('apiService',['$http', function($http){
                 'rvsection=0&',
                 'format=json&',
                 'callback=JSON_CALLBACK&',
-                'titles=',$scope.title,
+                'titles=',title,
                 '&redirects'].join('');
         return $http({
             url: url,
@@ -35,8 +34,8 @@ bdApp.service('apiService',['$http', function($http){
         });
     };
     this.getInfoBox = function(wikiJson) {
-        wikiJson.data.query.pages[Object.keys(d.data.query.pages)[0]].revisions[0]['*'];
-        var boxSearch = $scope.boxRegex.exec(wikiContent,'g');
-        return stuff[0];
+        var wikiContent = wikiJson.data.query.pages[Object.keys(wikiJson.data.query.pages)[0]].revisions[0]['*'];
+        var boxSearch = boxRegex.exec(wikiContent,'g');
+        return boxSearch[0];
     };
 }]);
