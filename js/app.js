@@ -67,8 +67,30 @@ bdApp.service('apiService',['$http', function($http){
     }
             
 }]);
-
-bdApp.service('parseService',[function(){
+bdApp.service("checkService",function(){
+    this.isPerson = function(wikiJson) {
+        try{
+            var wikiContent = wikiJson.data.query.pages[Object.keys(wikiJson.data.query.pages)[0]].revisions[0]['*'];
+            console.log(wikiJson.data.query.pages);
+            var boxSearch = new RegExp('{{[Ii]nfobox(.|\n)*}}', 'g').exec(wikiContent,'g');
+            boxRegex.lastIndex = 0;
+            var res =  boxSearch[0];
+            return true;
+        }catch(err) {
+            return false;
+        }
+        
+    };
+    this.isRedirect = function(wikiJson) {
+        var wikiContent = wikiJson.data.query.pages[Object.keys(wikiJson.data.query.pages)[0]].revisions[0]['*'];
+        var redirectReg = new RegExp('#REDIRECT[ ]*\[\[[A-z]*\]\]');
+        if(redirectReg.exec(wikiContent) != null) {
+            return true;
+        }
+        return false;
+    }
+});
+bdApp.service('parseService',function(){
     this.parsePerson = function(text) {
         // Remove comments
         text = this.replaceAll('<!--.*-->', '', text);
