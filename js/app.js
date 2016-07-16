@@ -83,12 +83,21 @@ bdApp.service("checkService",function(){
     };
     this.isRedirect = function(wikiJson) {
         var wikiContent = wikiJson.data.query.pages[Object.keys(wikiJson.data.query.pages)[0]].revisions[0]['*'];
-        var redirectReg = new RegExp('#REDIRECT[ ]*\[\[[A-z]*\]\]');
+        var redirectReg = new RegExp('#REDIRECT[ ]*\[\[[A-z]*\]\]', 'g');
         if(redirectReg.exec(wikiContent) != null) {
             return true;
         }
         return false;
+    };
+    this.isRefer = function(wikiJson) {
+        var wikiContent = wikiJson.data.query.pages[Object.keys(wikiJson.data.query.pages)[0]].revisions[0]['*'];
+        var referReg = new RegExp('may refer to','g');
+        if(referReg.exec(wikiContent) != null) {
+            return true;
+        }
+        return false;
     }
+    
 });
 bdApp.service('parseService',function(){
     this.parsePerson = function(text) {
