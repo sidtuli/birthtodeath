@@ -1,6 +1,6 @@
 var bdApp = angular.module('bdApp',[]);
 
-bdApp.controller('bdController',['$scope','apiService','parseService',function($scope,apiService,parseService){
+bdApp.controller('bdController',['$scope','apiService','checkService','parseService',function($scope,apiService,checkService,parseService){
     $scope.title = "";
     $scope.deathD = "";
     $scope.birthD = "";
@@ -9,13 +9,24 @@ bdApp.controller('bdController',['$scope','apiService','parseService',function($
         //console.log($scope.title);
         var req = apiService.requestPerson($scope.title);
         req.then(function(d){
-            var text = apiService.getInfoBox(d);
-            //console.log(text);
-            var info = parseService.parsePerson(text);
-            $scope.deathD = info["Death Date"];
-            $scope.birthD = info["Birth Date"];
-            $scope.deathP = info["Death Place"];
-            $scope.birthP = info["Birth Place"];
+            if (checkService.isPerson(d)){
+                var text = apiService.getInfoBox(d);
+                //console.log(text);
+                var info = parseService.parsePerson(text);
+                $scope.deathD = info["Death Date"];
+                $scope.birthD = info["Birth Date"];
+                $scope.deathP = info["Death Place"];
+                $scope.birthP = info["Birth Place"];
+            } else if(checkService.isRefer(d)){
+                
+                apiService.requestRefer($scope.title).then(function(d){
+                    console.log(d.data.query.pages[Object.keys(d.data.query.pages)[0]].revisions[0]['*']);
+                    
+                });
+            } else {
+                $scope.box = "Not a valid article?";
+            }
+            
         },function(d){
             $scope.box = "Error";
         });
@@ -27,6 +38,7 @@ bdApp.service('apiService',['$http', function($http){
     var boxRegex = new RegExp('{{[Ii]nfobox(.|\n)*}}', 'g');
     // Makes the request to the wikimedia api with a given title
     this.requestRefer = function(title) {
+        //console.log(title);
         var url = ['https://en.wikipedia.org/w/api.php?',
                 'action=query&',
                 'prop=revisions&',
@@ -59,7 +71,7 @@ bdApp.service('apiService',['$http', function($http){
     // Parses out the infobox of a wikipedia page from its wikimedia api json
     this.getInfoBox = function(wikiJson) {
         var wikiContent = wikiJson.data.query.pages[Object.keys(wikiJson.data.query.pages)[0]].revisions[0]['*'];
-        console.log(wikiJson.data.query.pages);
+        console.log(wikiContent);
         var boxSearch = boxRegex.exec(wikiContent,'g');
         boxRegex.lastIndex = 0;
         var res =  boxSearch[0];
@@ -96,7 +108,7 @@ bdApp.service("checkService",function(){
             return true;
         }
         return false;
-    }
+    };
     
 });
 bdApp.service('parseService',function(){
@@ -218,5 +230,5 @@ bdApp.service('parseService',function(){
         }
         return result;
     };
-    
-}]);
+});
+
