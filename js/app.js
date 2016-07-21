@@ -21,7 +21,8 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
                 
                 apiService.requestRefer($scope.title).then(function(d){
                     console.log(d.data.query.pages[Object.keys(d.data.query.pages)[0]].revisions[0]['*']);
-                    
+        
+                    $scope.list = parseService.parseRefer(d);
                 });
             } else {
                 $scope.box = "Not a valid article?";
@@ -85,8 +86,10 @@ bdApp.service("checkService",function(){
             var wikiContent = wikiJson.data.query.pages[Object.keys(wikiJson.data.query.pages)[0]].revisions[0]['*'];
             console.log(wikiJson.data.query.pages);
             var boxSearch = new RegExp('{{[Ii]nfobox(.|\n)*}}', 'g').exec(wikiContent,'g');
-            boxRegex.lastIndex = 0;
+            console.log(boxSearch);
+            
             var res =  boxSearch[0];
+            
             return true;
         }catch(err) {
             return false;
@@ -124,6 +127,22 @@ bdApp.service('parseService',function(){
         //console.log(lines);
         return ret;
     };
+    this.parseRefer = function(text) {
+        var listReg = new RegExp('\\*\\[\\[[A-z ,0-9\\"\\.\\-\\(\\)]*\\]\\][A-z ]*','g');
+        var listRegex = new RegExp(/\*\[\[[A-z ,0-9\"\.\-\(\)']*\]\][A-z \(\),0-9\–'\-\?\.\|/"]*/,'g');
+        var wikiContent = text.data.query.pages[Object.keys(text.data.query.pages)[0]].revisions[0]['*'];
+        
+        var entry = listRegex.exec(wikiContent,'g');
+        var lis = [];
+        while(entry != null) {
+            lis.push(entry[0]);
+            entry = listRegex.exec(wikiContent,'g');
+        }
+        
+        listRegex.lastIndex = 0;
+        console.log(lis);
+        return lis;
+    }
     // We process and format lines from the infobox
     this.processLines = function(text) {
         var res = {};
