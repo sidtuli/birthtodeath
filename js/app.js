@@ -128,19 +128,29 @@ bdApp.service('parseService',function(){
         return ret;
     };
     this.parseRefer = function(text) {
-        var listReg = new RegExp('\\*\\[\\[[A-z ,0-9\\"\\.\\-\\(\\)]*\\]\\]','g');
+        var listReg = new RegExp(/\[\[[A-z ,0-9\"\.\-\(\)']*\]\]/,'g');
         var listRegex = new RegExp(/\*\[\[[A-z ,0-9\"\.\-\(\)']*\]\][A-z \(\),0-9\–'\-\?\.\|/"]*/,'g');
         var wikiContent = text.data.query.pages[Object.keys(text.data.query.pages)[0]].revisions[0]['*'];
         
         var entry = listRegex.exec(wikiContent,'g');
+        
         var lis = [];
         var seachTerms = [];
         while(entry != null) {
+            var curr = {};
+            
             var currTerm = listReg.exec(entry[0],'g');
+            
             seachTerms.push(currTerm);
+            //console.log(this.replaceAll(/[\[\]]/,'',currTerm[0]));
+            curr.term = this.replaceAll(/[\[\]]/,'',currTerm[0]);
             listReg.lastIndex = 0;
-            lis.push(entry[0]);
+            //lis.push(entry[0]);
+            curr.full = entry[0];
+            lis.push(curr);
+            
             entry = listRegex.exec(wikiContent,'g');
+            
             
         }
         
