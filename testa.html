@@ -8,7 +8,7 @@
     </head>
     <body ng-controller="bdController">
         <input type="text" ng-model="title" />
-        <button ng-click="search()">Search</button>
+        <button ng-click="search(title)">Search</button>
         {{box}}
         <h3>Birth Date</h3>
         {{birthD}}
@@ -18,8 +18,6 @@
         {{birthP}}
         <h3>Death Place</h3>
         {{deathP}}
-        <ul>
-            <li ng-repeat="entry in list">{{entry}}</li>
-        </ul>
+        <div ng-include="'list.html'"></div>
     </body>
 </html>

@@ -1,13 +1,16 @@
 var bdApp = angular.module('bdApp',[]);
 
 bdApp.controller('bdController',['$scope','apiService','checkService','parseService',function($scope,apiService,checkService,parseService){
+    $scope.log = function(message) {
+        console.log(message);
+    };
     $scope.title = "";
     $scope.deathD = "";
     $scope.birthD = "";
     $scope.deathP = "";
-    $scope.search = function() {
+    $scope.search = function(title) {
         //console.log($scope.title);
-        var req = apiService.requestPerson($scope.title);
+        var req = apiService.requestPerson(title);
         req.then(function(d){
             if (checkService.isPerson(d)){
                 var text = apiService.getInfoBox(d);
@@ -19,7 +22,7 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
                 $scope.birthP = info["Birth Place"];
             } else if(checkService.isRefer(d)){
                 
-                apiService.requestRefer($scope.title).then(function(d){
+                apiService.requestRefer(title).then(function(d){
                     console.log(d.data.query.pages[Object.keys(d.data.query.pages)[0]].revisions[0]['*']);
         
                     $scope.list = parseService.parseRefer(d);
@@ -146,7 +149,7 @@ bdApp.service('parseService',function(){
             curr.term = this.replaceAll(/[\[\]]/,'',currTerm[0]);
             listReg.lastIndex = 0;
             //lis.push(entry[0]);
-            curr.full = entry[0];
+            curr.full = this.replaceAll(/[\[\]\*]/,'',entry[0]);
             lis.push(curr);
             
             entry = listRegex.exec(wikiContent,'g');
