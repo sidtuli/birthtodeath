@@ -4,6 +4,8 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
     $scope.log = function(message) {
         console.log(message);
     };
+    $scope.personInfo = false;
+    $scope.refList = false;
     $scope.title = "";
     $scope.deathD = "";
     $scope.birthD = "";
@@ -13,6 +15,7 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
         var req = apiService.requestPerson(title);
         req.then(function(d){
             if (checkService.isPerson(d)){
+                $scope.personInfo = true;
                 var text = apiService.getInfoBox(d);
                 //console.log(text);
                 var info = parseService.parsePerson(text);
@@ -24,8 +27,8 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
                 
                 apiService.requestRefer(title).then(function(d){
                     console.log(d.data.query.pages[Object.keys(d.data.query.pages)[0]].revisions[0]['*']);
-        
                     $scope.list = parseService.parseRefer(d);
+                    $scope.refList = true;
                 });
             } else {
                 $scope.box = "Not a valid article?";
