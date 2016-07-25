@@ -10,7 +10,7 @@
         <input type="text" ng-model="title" />
         <button ng-click="search(title)">Search</button>
         {{box}}
-        <div ng-show="personInfo" ng-include="'info.html'"></div>
-        <div ng-show="refList" ng-include="'list.html'"></div>
+        <div ng-show="phase[0]" ng-include="'info.html'"></div>
+        <div ng-show="phase[1]" ng-include="'list.html'"></div>
     </body>
 </html>

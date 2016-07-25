@@ -4,37 +4,48 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
     $scope.log = function(message) {
         console.log(message);
     };
-    $scope.personInfo = false;
-    $scope.refList = false;
+    // A variable to track which state we are currently in
+    // phase[0] - a person's info
+    // phase[1] - a 'may refer to' list
+    $scope.phase=[false,false];
+    
     $scope.title = "";
     $scope.deathD = "";
     $scope.birthD = "";
     $scope.deathP = "";
     $scope.search = function(title) {
         //console.log($scope.title);
+         Make an initial request
         var req = apiService.requestPerson(title);
         req.then(function(d){
+            // If the request returns a person we begin parsing the infobox out and all their info
             if (checkService.isPerson(d)){
-                $scope.personInfo = true;
+                $scope.box = "";
+                
                 var text = apiService.getInfoBox(d);
-                //console.log(text);
+                // Parse out the information needed from a person's article page
                 var info = parseService.parsePerson(text);
+                // We assign the info to be displayed in the info template
                 $scope.deathD = info["Death Date"];
                 $scope.birthD = info["Birth Date"];
                 $scope.deathP = info["Death Place"];
                 $scope.birthP = info["Birth Place"];
+                // Then we finally show the the info.html templaye
+                $scope.phase = [true,false];
+            // If it's a page that has disambiguation then we serve the list template
             } else if(checkService.isRefer(d)){
-                
+                $scope.box = "";
+                $scope.phase = [false,true];
                 apiService.requestRefer(title).then(function(d){
-                    console.log(d.data.query.pages[Object.keys(d.data.query.pages)[0]].revisions[0]['*']);
                     $scope.list = parseService.parseRefer(d);
-                    $scope.refList = true;
                 });
             } else {
-                $scope.box = "Not a valid article?";
+                //$scope.phase=[false,false];
+                $scope.box = "Not a valid article";
             }
             
         },function(d){
+            $scope.phase = [false,false];
             $scope.box = "Error";
         });
     };
@@ -143,15 +154,13 @@ bdApp.service('parseService',function(){
         var lis = [];
         var seachTerms = [];
         while(entry != null) {
+            // Make a current object to hold the new values.
             var curr = {};
-            
             var currTerm = listReg.exec(entry[0],'g');
             
-            seachTerms.push(currTerm);
-            //console.log(this.replaceAll(/[\[\]]/,'',currTerm[0]));
             curr.term = this.replaceAll(/[\[\]]/,'',currTerm[0]);
             listReg.lastIndex = 0;
-            //lis.push(entry[0]);
+            
             curr.full = this.replaceAll(/[\[\]\*]/,'',entry[0]);
             lis.push(curr);
             
@@ -161,7 +170,7 @@ bdApp.service('parseService',function(){
         }
         
         listRegex.lastIndex = 0;
-        console.log(seachTerms);
+        
         return lis;
     }
     // We process and format lines from the infobox
@@ -169,8 +178,6 @@ bdApp.service('parseService',function(){
         var res = {};
         var result = {};
         result = text.split("\n");
-        //console.log(text.split("\n"));
-        //console.log(result);
         var serv = this;
         result.forEach(function(item){
             
@@ -178,7 +185,7 @@ bdApp.service('parseService',function(){
             if(itemIndex != -1) {
                 var item_name = item.substr(0, itemIndex).trim();
                 var item_content = item.substr(itemIndex + 1).trim().split('\n')[0];
-                //console.log(item+"-"+item_name+"-"+item_content);
+                
                 /*
                 * Extract all simple texts inside '[[ ]]'
                 * such as [[France]], [[Language French|French]], etc.
