@@ -8,14 +8,14 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
     // phase[0] - a person's info
     // phase[1] - a 'may refer to' list
     $scope.phase=[false,false];
-    
+    // Variables that hold all the person's relevant info
     $scope.title = "";
     $scope.deathD = "";
     $scope.birthD = "";
     $scope.deathP = "";
     $scope.search = function(title) {
         //console.log($scope.title);
-         Make an initial request
+        // Make an initial request
         var req = apiService.requestPerson(title);
         req.then(function(d){
             // If the request returns a person we begin parsing the infobox out and all their info
@@ -30,8 +30,13 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
                 $scope.birthD = info["Birth Date"];
                 $scope.deathP = info["Death Place"];
                 $scope.birthP = info["Birth Place"];
-                // Then we finally show the the info.html templaye
-                $scope.phase = [true,false];
+                // Then we finally show the the info.html template
+                if($scope.deathD == null || $scope.deathP == null) {
+                    $scope.box = "That person is alive :D"
+                } else {
+                    $scope.phase = [true,false];
+                }
+                
             // If it's a page that has disambiguation then we serve the list template
             } else if(checkService.isRefer(d)){
                 $scope.box = "";
@@ -51,7 +56,7 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
     };
     
 }]);
-
+// This a service to facilitate varying requests 
 bdApp.service('apiService',['$http', function($http){
     var boxRegex = new RegExp('{{[Ii]nfobox(.|\n)*}}', 'g');
     // Makes the request to the wikimedia api with a given title
@@ -97,6 +102,7 @@ bdApp.service('apiService',['$http', function($http){
     }
             
 }]);
+// This is a service to check what type of article was retrieved from a request
 bdApp.service("checkService",function(){
     this.isPerson = function(wikiJson) {
         try{
@@ -129,8 +135,8 @@ bdApp.service("checkService",function(){
         }
         return false;
     };
-    
 });
+// This service is to take in wikipedia text and then return relevant info
 bdApp.service('parseService',function(){
     this.parsePerson = function(text) {
         // Remove comments
@@ -243,7 +249,7 @@ bdApp.service('parseService',function(){
         });
         return res;
     };
-    // Method to replae every instance of find with replace in str
+    // Method to replace every instance of find with replace in str
     this.replaceAll = function(find, replace, str) {
         if(str) {
             return str.replace(new RegExp(find, 'gm'), replace).trim();
@@ -251,27 +257,26 @@ bdApp.service('parseService',function(){
             return null;
         }
     };
+    // This takes in the processed lines and then find the relevant lines 
     this.findDatesPlaces = function(lines) {
         var result = {};
         for(var key in lines) {
+            // Here are the regexs used in order to find out if we got a line we care about
             var birthD = new RegExp(/[Bb]irth_[Dd]ate/,"g");
             var deathD = new RegExp(/[Dd]eath_[Dd]ate/,"g");
             var deathP = new RegExp(/[Dd]eath_[Pp]lace/,"g");
             var birthP = new RegExp(/[Bb]irth_[Pp]lace/,"g");
             if(birthD.exec(key)) {
-                //console.log(key);
                 result["Birth Date"] = lines[key];
             }
             if(deathD.exec(key)) {
-                //console.log(key);
+                
                 result["Death Date"] = lines[key];
             }
             if(deathP.exec(key)) {
-                //console.log(key);
                 result["Death Place"] = lines[key];
             }
             if(birthP.exec(key)) {
-                //console.log(key);
                 result["Birth Place"] = lines[key];
             }
         }
