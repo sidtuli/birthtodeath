@@ -32,12 +32,14 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
                 $scope.birthP = info["Birth Place"];
                 // Then we finally show the the info.html template
                 if($scope.deathD == null || $scope.deathP == null) {
-                    $scope.box = "That person is alive :D";
+                    $scope.box = "That person is alive :D (or not important enough for Wikipedia to list them :()";
                 } else {
                     birthDate = parseService.formatDate(info["Birth Date"]);
                     deathDate = parseService.formatDate(info["Death Date"]);
-                    $scope.deathD = deathDate.prettyForm;
-                    $scope.birthD = birthDate.prettyForm;
+                    $scope.deathD = deathDate.hasOwnProperty("invalid") ? "Wikipedia doesn't have the info" : deathDate.prettyForm;
+                    $scope.birthD = birthDate.hasOwnProperty("invalid") ? "Wikipedia doesn't have the info" : birthDate.prettyForm;
+                    $scope.age = parseService.formateAge(deathDate.dateNum,birthDate.dateNum);
+                    console.log($scope.age);
                     $scope.phase = [true,false];
                     
                 }
@@ -295,9 +297,19 @@ bdApp.service('parseService',function(){
         var year = parseInt(matchArray[0],10);
         var month = parseInt(matchArray[1],10);
         var day = parseInt(matchArray[2],10);
+        if(isNaN(day) || isNaN(month) || isNan(year) || day > 31 || year < 0 || day <= 0 || month > 12 || month <= 0){
+            result["invalid"] = true;
+        }
         result["dateNum"] = {"year":year,"month":month,"day":day};
         var prettyDate = months[month-1] +" "+day+", "+year;
         result["prettyForm"] = prettyDate;
+        return result;
+    };
+    this.formateAge = function(deathDateObject,birthDateObject) {
+        var result = deathDateObject.year - birthDateObject.year;
+        var monthTest = deathDateObject.month < birthDateObject.month;
+        var dayTest = (deathDateObject.month==birthDateObject.month) && deathDateObject.day < birthDateObject.day;
+        result = monthTest || dayTest ? result - 1 : result;
         return result;
     };
 });
