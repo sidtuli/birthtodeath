@@ -32,9 +32,14 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
                 $scope.birthP = info["Birth Place"];
                 // Then we finally show the the info.html template
                 if($scope.deathD == null || $scope.deathP == null) {
-                    $scope.box = "That person is alive :D"
+                    $scope.box = "That person is alive :D";
                 } else {
+                    birthDate = parseService.formatDate(info["Birth Date"]);
+                    deathDate = parseService.formatDate(info["Death Date"]);
+                    $scope.deathD = deathDate.prettyForm;
+                    $scope.birthD = birthDate.prettyForm;
                     $scope.phase = [true,false];
+                    
                 }
                 
             // If it's a page that has disambiguation then we serve the list template
@@ -61,7 +66,7 @@ bdApp.service('apiService',['$http', function($http){
     var boxRegex = new RegExp('{{[Ii]nfobox(.|\n)*}}', 'g');
     // Makes the request to the wikimedia api with a given title
     this.requestRefer = function(title) {
-        //console.log(title);
+        
         var url = ['https://en.wikipedia.org/w/api.php?',
                 'action=query&',
                 'prop=revisions&',
@@ -76,7 +81,7 @@ bdApp.service('apiService',['$http', function($http){
         });
     };
     this.requestPerson = function(title) {
-        //console.log(title);
+        
         var url = ['https://en.wikipedia.org/w/api.php?',
                 'action=query&',
                 'prop=revisions&',
@@ -94,7 +99,7 @@ bdApp.service('apiService',['$http', function($http){
     // Parses out the infobox of a wikipedia page from its wikimedia api json
     this.getInfoBox = function(wikiJson) {
         var wikiContent = wikiJson.data.query.pages[Object.keys(wikiJson.data.query.pages)[0]].revisions[0]['*'];
-        console.log(wikiContent);
+        
         var boxSearch = boxRegex.exec(wikiContent,'g');
         boxRegex.lastIndex = 0;
         var res =  boxSearch[0];
@@ -107,9 +112,9 @@ bdApp.service("checkService",function(){
     this.isPerson = function(wikiJson) {
         try{
             var wikiContent = wikiJson.data.query.pages[Object.keys(wikiJson.data.query.pages)[0]].revisions[0]['*'];
-            console.log(wikiJson.data.query.pages);
+            
             var boxSearch = new RegExp('{{[Ii]nfobox(.|\n)*}}', 'g').exec(wikiContent,'g');
-            console.log(boxSearch);
+            
             
             var res =  boxSearch[0];
             
@@ -147,7 +152,6 @@ bdApp.service('parseService',function(){
         text = this.replaceAll('\{\{refn[^\}\}]*?\}\}', '', text);
         var lines = this.processLines(text);
         var ret = this.findDatesPlaces(lines);
-        //console.log(lines);
         return ret;
     };
     this.parseRefer = function(text) {
@@ -280,6 +284,20 @@ bdApp.service('parseService',function(){
                 result["Birth Place"] = lines[key];
             }
         }
+        return result;
+    };
+    // Take the wikipedia date string and then translate that into a usable format in an object with several key value pairs
+    this.formatDate = function(dateString) {
+        var result = {};
+        var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+        var numReg = /[0-9]+/g;
+        var matchArray = dateString.match(numReg);
+        var year = parseInt(matchArray[0],10);
+        var month = parseInt(matchArray[1],10);
+        var day = parseInt(matchArray[2],10);
+        result["dateNum"] = {"year":year,"month":month,"day":day};
+        var prettyDate = months[month-1] +" "+day+", "+year;
+        result["prettyForm"] = prettyDate;
         return result;
     };
 });
