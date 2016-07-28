@@ -13,6 +13,7 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
     $scope.deathD = "";
     $scope.birthD = "";
     $scope.deathP = "";
+    $scope.age = "";
     $scope.search = function(title) {
         //console.log($scope.title);
         // Make an initial request
@@ -38,7 +39,7 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
                     deathDate = parseService.formatDate(info["Death Date"]);
                     $scope.deathD = deathDate.hasOwnProperty("invalid") ? "Wikipedia doesn't have the info" : deathDate.prettyForm;
                     $scope.birthD = birthDate.hasOwnProperty("invalid") ? "Wikipedia doesn't have the info" : birthDate.prettyForm;
-                    $scope.age = parseService.formateAge(deathDate.dateNum,birthDate.dateNum);
+                    $scope.age = deathDate.hasOwnProperty("invalid") || birthDate.hasOwnProperty("invalid") ? "Wikipedia did not supply correct info to find age" : parseService.formateAge(deathDate.dateNum,birthDate.dateNum);
                     console.log($scope.age);
                     $scope.phase = [true,false];
                     
@@ -297,7 +298,7 @@ bdApp.service('parseService',function(){
         var year = parseInt(matchArray[0],10);
         var month = parseInt(matchArray[1],10);
         var day = parseInt(matchArray[2],10);
-        if(isNaN(day) || isNaN(month) || isNan(year) || day > 31 || year < 0 || day <= 0 || month > 12 || month <= 0){
+        if(!angular.isNumber(day) || !angular.isNumber(month) || !angular.isNumber(year) || day > 31 || year < 0 || day <= 0 || month > 12 || month <= 0){
             result["invalid"] = true;
         }
         result["dateNum"] = {"year":year,"month":month,"day":day};
