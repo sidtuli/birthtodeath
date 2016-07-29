@@ -40,7 +40,7 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
                     $scope.deathD = deathDate.hasOwnProperty("invalid") ? "Wikipedia doesn't have the info" : deathDate.prettyForm;
                     $scope.birthD = birthDate.hasOwnProperty("invalid") ? "Wikipedia doesn't have the info" : birthDate.prettyForm;
                     $scope.age = deathDate.hasOwnProperty("invalid") || birthDate.hasOwnProperty("invalid") ? "Wikipedia did not supply correct info to find age" : parseService.formateAge(deathDate.dateNum,birthDate.dateNum);
-                    console.log($scope.age);
+                    
                     $scope.phase = [true,false];
                     
                 }
