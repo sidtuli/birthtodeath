@@ -5,6 +5,7 @@
         <meta charset="UTF-8"/>
         <script src="js/angular.js"></script>
         <script src="js/app.js"></script>
+        
     </head>
     <body ng-controller="bdController">
         <input type="text" ng-model="title" />
@@ -12,5 +13,39 @@
         {{box}}
         <div ng-show="phase[0]" ng-include="'info.html'"></div>
         <div ng-show="phase[1]" ng-include="'list.html'"></div>
+        
+        <div id="map" style="width:500px;height:380px;">></div>
+    <script>
+      function initMap() {
+        var directionsService = new google.maps.DirectionsService;
+        var directionsDisplay = new google.maps.DirectionsRenderer;
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 7,
+          center: {lat: 41.85, lng: -87.65}
+        });
+        directionsDisplay.setMap(map);
+        calculateAndDisplayRoute(directionsService, directionsDisplay, "Chicago", "Washington D.C.");
+        
+        
+      }
+
+      function calculateAndDisplayRoute(directionsService, directionsDisplay, originString, destinationString) {
+        directionsService.route({
+          origin: originString,
+          destination: destinationString,
+          travelMode: 'DRIVING'
+        }, function(response, status) {
+          if (status === 'OK') {
+            directionsDisplay.setDirections(response);
+            console.log(response);
+          } else {
+            window.alert('Directions request failed due to ' + status);
+          }
+        });
+      }
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyATLVXUzJhvTD-xV96EpM1B4bBnWYGhEPI&callback=initMap">
+    </script>
     </body>
 </html>
