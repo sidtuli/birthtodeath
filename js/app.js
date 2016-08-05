@@ -1,10 +1,10 @@
-var bdApp = angular.module('bdApp',[]);
+var bdApp = angular.module('bdApp',['ngMap']);
 
 bdApp.controller('bdController',['$scope','apiService','checkService','parseService',function($scope,apiService,checkService,parseService){
     $scope.log = function(message) {
         console.log(message);
     };
-    
+    $scope.googleMapsUrl="https://maps.googleapis.com/maps/api/js?key=AIzaSyATLVXUzJhvTD-xV96EpM1B4bBnWYGhEPI";
     // A variable to track which state we are currently in
     // phase[0] - a person's info
     // phase[1] - a 'may refer to' list
@@ -16,6 +16,7 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
     $scope.deathP = "";
     $scope.age = "";
     $scope.search = function(title) {
+        try{
         //console.log($scope.title);
         // Make an initial request
         var req = apiService.requestPerson(title);
@@ -62,6 +63,9 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
             $scope.phase = [false,false];
             $scope.box = "Error";
         });
+        } catch (error) {
+            $scope.box = "Not a valid article";
+        }
     };
     
 }]);
