@@ -1,6 +1,7 @@
 var bdApp = angular.module('bdApp',['ngMap']);
 
-bdApp.controller('bdController',['$scope','apiService','checkService','parseService',function($scope,apiService,checkService,parseService){
+bdApp.controller('bdController',['$scope','apiService','checkService','parseService','NgMap',function($scope,apiService,checkService,parseService,NgMap){
+    
     $scope.log = function(message) {
         console.log(message);
     };
@@ -52,6 +53,7 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
                     $scope.age = deathDate.hasOwnProperty("invalid") || birthDate.hasOwnProperty("invalid") ? "Wikipedia did not supply correct info to find age" : parseService.formateAge(deathDate.dateNum,birthDate.dateNum);
                     
                     $scope.phase = [true,false];
+                    console.log(NgMap.initMap());
                     
                 }
                 
