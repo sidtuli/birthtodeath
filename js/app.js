@@ -4,6 +4,14 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
     $scope.log = function(message) {
         console.log(message);
     };
+    $scope.birthPlace = function() {
+        console.log($scope.birthP);
+        return $scope.birthP;
+    }
+    $scope.deathPlace = function() {
+        console.log($scope.deathP);
+        return $scope.deathP;
+    }
     $scope.googleMapsUrl="https://maps.googleapis.com/maps/api/js?key=AIzaSyATLVXUzJhvTD-xV96EpM1B4bBnWYGhEPI";
     // A variable to track which state we are currently in
     // phase[0] - a person's info

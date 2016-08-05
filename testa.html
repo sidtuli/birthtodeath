@@ -19,12 +19,12 @@
         <div ng-show="phase[0]" ng-include="'info.html'"></div>
         
         <div ng-style="{'visibility':phase[0] ? 'visible':'hidden'}">
-            <ng-map  zoom="14" center="37.7699298, -122.4469157" style="height:30%;width:100%;" >
+            <ng-map id="map" zoom="14" center="37.7699298, -122.4469157" style="height:30%;width:100%;" >
                 <directions 
                     draggable="true"
                     travel-mode="DRIVING"
-                    origin="{{birthP}}"
-                    destination="{{deathP}}">
+                    origin="{{birthPlace()}}"
+                    destination="{{deathPlace()}}">
                 </directions>
             </ng-map>
             {{map.directionsRenderers[0].directions.routes[0].overview_path.length}} km
