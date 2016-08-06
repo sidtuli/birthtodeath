@@ -1,16 +1,18 @@
 var bdApp = angular.module('bdApp',['ngMap']);
 
 bdApp.controller('bdController',['$scope','apiService','checkService','parseService','NgMap',function($scope,apiService,checkService,parseService,NgMap){
-    
+    NgMap.getMap("map").then(function(d){
+        console.log(d.directionsRenderers);
+    });
     $scope.log = function(message) {
         console.log(message);
     };
     $scope.birthPlace = function() {
-        console.log($scope.birthP);
+        //console.log($scope.birthP);
         return $scope.birthP;
     }
     $scope.deathPlace = function() {
-        console.log($scope.deathP);
+        //console.log($scope.deathP);
         return $scope.deathP;
     }
     $scope.googleMapsUrl="https://maps.googleapis.com/maps/api/js?key=AIzaSyATLVXUzJhvTD-xV96EpM1B4bBnWYGhEPI";
@@ -23,6 +25,7 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
     $scope.deathD = "";
     $scope.birthD = "";
     $scope.deathP = "";
+    $scope.birthP = "";
     $scope.age = "";
     $scope.search = function(title) {
         try{
@@ -53,7 +56,7 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
                     $scope.age = deathDate.hasOwnProperty("invalid") || birthDate.hasOwnProperty("invalid") ? "Wikipedia did not supply correct info to find age" : parseService.formateAge(deathDate.dateNum,birthDate.dateNum);
                     
                     $scope.phase = [true,false];
-                    console.log(NgMap.getMap("map"));
+                    console.log(NgMap.initMap("map"));
                     
                 }
                 
