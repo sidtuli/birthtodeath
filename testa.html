@@ -18,6 +18,8 @@
         {{box}}
         <div ng-show="phase[0]" ng-include="'info.html'"></div>
         
+        
+        <div ng-show="phase[1]" ng-include="'list.html'"></div>
         <div ng-style="{'visibility':phase[0] ? 'visible':'hidden'}" map-lazy-load="https://maps.google.com/maps/api/js"
   map-lazy-load-params="{{googleMapsUrl}}">
             
@@ -31,6 +33,5 @@
             </ng-map>
             {{map.directionsRenderers[0].directions.routes[0].overview_path.length}} km
         </div>
-        <div ng-show="phase[1]" ng-include="'list.html'"></div>
     </body>
 </html>

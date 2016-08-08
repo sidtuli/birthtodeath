@@ -2,14 +2,23 @@ var bdApp = angular.module('bdApp',['ngMap']);
 
 bdApp.controller('bdController',['$scope','apiService','checkService','parseService','NgMap','$q',function($scope,apiService,checkService,parseService,NgMap,$q){
     
+    $scope.promise = "";
     
+    $scope.destinationHit = false;
+    $scope.originHit = false;
     $scope.birthPlace = function() {
+        if($scope.promise = "") {
+            return $scope.birthP;
+        }
+        console.log($scope.promise);
         console.log($scope.birthP);
         //setTimeout(function(){},100);
         return $scope.birthP;
     }
     $scope.deathPlace = function() {
-        
+        if($scope.promise = "") {
+            return $scope.deathP;
+        }
         console.log($scope.deathP);
         //setTimeout(function(){},100);
         return $scope.deathP;
@@ -28,11 +37,11 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
     $scope.age = "";
     
     $scope.search = function(title) {
-        try{
+        
         //console.log($scope.title);
         // Make an initial request
         var req = apiService.requestPerson(title);
-        req.then(function(d){
+        $scope.promise = req.then(function(d){
             // If the request returns a person we begin parsing the infobox out and all their info
             if (checkService.isPerson(d)){
                 $scope.box = "";
@@ -49,6 +58,7 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
                 // Then we finally show the the info.html template
                 if($scope.deathD == null || $scope.deathP == null) {
                     $scope.box = "That person is alive :D (or not important enough for Wikipedia to list them :()";
+                    return null;
                 } else {
                     birthDate = parseService.formatDate(info["Birth Date"]);
                     deathDate = parseService.formatDate(info["Death Date"]);
@@ -57,23 +67,7 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
                     $scope.age = deathDate.hasOwnProperty("invalid") || birthDate.hasOwnProperty("invalid") ? "Wikipedia did not supply correct info to find age" : parseService.formateAge(deathDate.dateNum,birthDate.dateNum);
                     
                     $scope.phase = [true,false];
-                    /*console.log(NgMap);
-                    var request = {
-                        origin: info["Birth Place"],
-                        destination: info["Death Place"],
-                        optimizeWaypoints: true,
-                        travelMode: "DRIVING"
-                    };*/
-                    NgMap.getMap("map").then(function(map){
-                        var directionsDisplay = map.directionsRenderers[0].directions;
-                        if(directionsDisplay){
-                            console.log(directionsDisplay.request);
-                        }
-                    });
-                    
-                    //NgMap.deleteMap(NgMap.getMap("map"));
-                    
-                    
+                    return info;
                 }
                 
             // If it's a page that has disambiguation then we serve the list template
@@ -83,18 +77,19 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
                 apiService.requestRefer(title).then(function(d){
                     $scope.list = parseService.parseRefer(d);
                 });
+                return null;
             } else {
                 //$scope.phase=[false,false];
                 $scope.box = "Not a valid article";
+                return null;
             }
             
         },function(d){
             $scope.phase = [false,false];
             $scope.box = "Error";
+            return null;
         });
-        } catch (error) {
-            $scope.box = "Not a valid article";
-        }
+        
     };
     
 }]);
