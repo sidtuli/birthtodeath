@@ -1,28 +1,11 @@
 var bdApp = angular.module('bdApp',['ngMap']);
 
-bdApp.controller('bdController',['$scope','apiService','checkService','parseService','NgMap','$q',function($scope,apiService,checkService,parseService,NgMap,$q){
+
+bdApp.controller('bdController',['$scope','apiService','checkService','parseService','NgMap','$window',function($scope,apiService,checkService,parseService,NgMap,$window){
     
-    $scope.promise = "";
+    console.log($window.innerHeight)
     
-    $scope.destinationHit = false;
-    $scope.originHit = false;
-    $scope.birthPlace = function() {
-        if($scope.promise = "") {
-            return $scope.birthP;
-        }
-        console.log($scope.promise);
-        console.log($scope.birthP);
-        //setTimeout(function(){},100);
-        return $scope.birthP;
-    }
-    $scope.deathPlace = function() {
-        if($scope.promise = "") {
-            return $scope.deathP;
-        }
-        console.log($scope.deathP);
-        //setTimeout(function(){},100);
-        return $scope.deathP;
-    }
+    
     $scope.googleMapsUrl="https://maps.googleapis.com/maps/api/js?key=AIzaSyATLVXUzJhvTD-xV96EpM1B4bBnWYGhEPI";
     // A variable to track which state we are currently in
     // phase[0] - a person's info
@@ -37,11 +20,10 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
     $scope.age = "";
     
     $scope.search = function(title) {
-        
         //console.log($scope.title);
         // Make an initial request
         var req = apiService.requestPerson(title);
-        $scope.promise = req.then(function(d){
+        req.then(function(d){
             // If the request returns a person we begin parsing the infobox out and all their info
             if (checkService.isPerson(d)){
                 $scope.box = "";
@@ -58,16 +40,14 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
                 // Then we finally show the the info.html template
                 if($scope.deathD == null || $scope.deathP == null) {
                     $scope.box = "That person is alive :D (or not important enough for Wikipedia to list them :()";
-                    return null;
+                    
                 } else {
                     birthDate = parseService.formatDate(info["Birth Date"]);
                     deathDate = parseService.formatDate(info["Death Date"]);
                     $scope.deathD = deathDate.hasOwnProperty("invalid") ? "Wikipedia doesn't have the info" : deathDate.prettyForm;
                     $scope.birthD = birthDate.hasOwnProperty("invalid") ? "Wikipedia doesn't have the info" : birthDate.prettyForm;
                     $scope.age = deathDate.hasOwnProperty("invalid") || birthDate.hasOwnProperty("invalid") ? "Wikipedia did not supply correct info to find age" : parseService.formateAge(deathDate.dateNum,birthDate.dateNum);
-                    
                     $scope.phase = [true,false];
-                    return info;
                 }
                 
             // If it's a page that has disambiguation then we serve the list template
@@ -77,17 +57,14 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
                 apiService.requestRefer(title).then(function(d){
                     $scope.list = parseService.parseRefer(d);
                 });
-                return null;
             } else {
                 //$scope.phase=[false,false];
                 $scope.box = "Not a valid article";
-                return null;
             }
-            
         },function(d){
             $scope.phase = [false,false];
             $scope.box = "Error";
-            return null;
+            
         });
         
     };
