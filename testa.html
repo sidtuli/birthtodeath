@@ -21,7 +21,7 @@
         
         <div ng-show="phase[1]" ng-include="'list.html'"></div>
         
-        <div id="map2" height="100px"></div>
+        <div googlemap ng-style="{'visibility' : phase[0] ? 'visible' : 'hidden'}" id="map2"></div>
         
         
         

@@ -1,10 +1,49 @@
 var bdApp = angular.module('bdApp',['ngMap']);
 
+bdApp.directive('googlemap', function($window) {
+    return function (scope, element, attrs) {
+        //console.log($window.innerHeight);
+        element.css('height', ($window.innerHeight/2)+"px");
+    }
+});
+
 
 bdApp.controller('bdController',['$scope','apiService','checkService','parseService','NgMap','$window',function($scope,apiService,checkService,parseService,NgMap,$window){
+    //console.log($window.innerHeight);
+    var directionsService = new google.maps.DirectionsService();
+    var directionsDisplay = new google.maps.DirectionsRenderer();
+    function initialize() {
+        var mapProp = {
+            center:new google.maps.LatLng(0,0),
+            zoom:5,
+            mapTypeId:google.maps.MapTypeId.ROADMAP
+        };
+        var map = new google.maps.Map(document.getElementById("map2"), mapProp);
+        directionsDisplay.setMap(map);
+        //console.log(map)
+        
+    }
     
-    console.log($window.innerHeight)
-    
+    function calcRoute(start,end) {
+        
+        var request = {
+        origin: start,
+        destination: end,
+        // Note that Javascript allows us to access the constant
+        // using square brackets and a string value as its
+        // "property."
+        travelMode: "DRIVING"
+        };
+        directionsService.route(request, function(response, status) {
+            if (status == 'OK') {
+            directionsDisplay.setDirections(response);
+            } else {
+                console.log("Directions failed " +status);
+            }
+        });
+    }
+    google.maps.event.addDomListener(window, 'load', initialize);
+    //calcRoute("Washington DC", "Chicago");
     
     $scope.googleMapsUrl="https://maps.googleapis.com/maps/api/js?key=AIzaSyATLVXUzJhvTD-xV96EpM1B4bBnWYGhEPI";
     // A variable to track which state we are currently in
@@ -36,7 +75,7 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
                 $scope.birthD = info["Birth Date"];
                 $scope.deathP = info["Death Place"];
                 $scope.birthP = info["Birth Place"];
-                console.log("places assigned")
+                //console.log("places assigned")
                 // Then we finally show the the info.html template
                 if($scope.deathD == null || $scope.deathP == null) {
                     $scope.box = "That person is alive :D (or not important enough for Wikipedia to list them :()";
@@ -47,6 +86,7 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
                     $scope.deathD = deathDate.hasOwnProperty("invalid") ? "Wikipedia doesn't have the info" : deathDate.prettyForm;
                     $scope.birthD = birthDate.hasOwnProperty("invalid") ? "Wikipedia doesn't have the info" : birthDate.prettyForm;
                     $scope.age = deathDate.hasOwnProperty("invalid") || birthDate.hasOwnProperty("invalid") ? "Wikipedia did not supply correct info to find age" : parseService.formateAge(deathDate.dateNum,birthDate.dateNum);
+                    calcRoute(info["Birth Place"],info["Death Place"]);
                     $scope.phase = [true,false];
                 }
                 
