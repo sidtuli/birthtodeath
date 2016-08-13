@@ -27,16 +27,16 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
     function calcRoute(start,end) {
         
         var request = {
-        origin: start,
-        destination: end,
-        // Note that Javascript allows us to access the constant
-        // using square brackets and a string value as its
-        // "property."
-        travelMode: "DRIVING"
+            origin: start,
+            destination: end,
+            // Note that Javascript allows us to access the constant
+            // using square brackets and a string value as its
+            // "property."
+            travelMode: "DRIVING"
         };
         directionsService.route(request, function(response, status) {
             if (status == 'OK') {
-            directionsDisplay.setDirections(response);
+                directionsDisplay.setDirections(response);
             } else {
                 console.log("Directions failed " +status);
             }
@@ -85,6 +85,8 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
                     deathDate = parseService.formatDate(info["Death Date"]);
                     $scope.deathD = deathDate.hasOwnProperty("invalid") ? "Wikipedia doesn't have the info" : deathDate.prettyForm;
                     $scope.birthD = birthDate.hasOwnProperty("invalid") ? "Wikipedia doesn't have the info" : birthDate.prettyForm;
+                    console.log(info["Birth Date"])
+                    console.log(info["Death Date"])
                     $scope.age = deathDate.hasOwnProperty("invalid") || birthDate.hasOwnProperty("invalid") ? "Wikipedia did not supply correct info to find age" : parseService.formateAge(deathDate.dateNum,birthDate.dateNum);
                     calcRoute(info["Birth Place"],info["Death Place"]);
                     $scope.phase = [true,false];
