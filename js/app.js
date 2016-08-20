@@ -63,8 +63,11 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
         // Make an initial request
         var req = apiService.requestPerson(title);
         req.then(function(d){
+            if(d.data.query.pages.hasOwnProperty("-1")) {
+                $scope.box = "Not a valid article";
+            }
             // If the request returns a person we begin parsing the infobox out and all their info
-            if (checkService.isPerson(d)){
+            else if (checkService.isPerson(d)){
                 $scope.box = "";
                 
                 var text = apiService.getInfoBox(d);
