@@ -1,15 +1,16 @@
+// Defining the birth-death angular app 
 var bdApp = angular.module('bdApp',['ngMap']);
 
+// This is a directive to defne a google map container
 bdApp.directive('googlemap', function($window) {
     return function (scope, element, attrs) {
-        //console.log($window.innerHeight);
         element.css('height', ($window.innerHeight/2)+"px");
     }
 });
 
-
+// The overarching controller for the entire project
 bdApp.controller('bdController',['$scope','apiService','checkService','parseService','NgMap','$window',function($scope,apiService,checkService,parseService,NgMap,$window){
-    //console.log($window.innerHeight);
+    // Set up the map
     var directionsService = new google.maps.DirectionsService();
     var directionsDisplay = new google.maps.DirectionsRenderer();
     function initialize() {
@@ -29,9 +30,7 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
         var request = {
             origin: start,
             destination: end,
-            // Note that Javascript allows us to access the constant
-            // using square brackets and a string value as its
-            // "property."
+            
             travelMode: "DRIVING"
         };
         directionsService.route(request, function(response, status) {
@@ -63,6 +62,7 @@ bdApp.controller('bdController',['$scope','apiService','checkService','parseServ
         // Make an initial request
         var req = apiService.requestPerson(title);
         req.then(function(d){
+            // An error check to see if there is an 
             if(d.data.query.pages.hasOwnProperty("-1")) {
                 $scope.box = "Not a valid article";
             }
